@@ -27,6 +27,10 @@
 
                         @livewire('sidebar-menu-item', ['name' => __('menu.landingSites'), 'icon' => 'landing', 'link' => route('superadmin.landing-sites.index'), 'active' => request()->routeIs('superadmin.landing-sites.*')])
 
+                        @livewire('sidebar-menu-item', ['name' => __('modules.hotel.hotels'), 'icon' => 'restaurants', 'link' => route('superadmin.hotels.index'), 'active' => request()->routeIs('superadmin.hotels.*')])
+
+                        @livewire('sidebar-menu-item', ['name' => __('modules.hotel.configureHotel'), 'icon' => 'settings', 'link' => route('superadmin.configure-hotel'), 'active' => request()->routeIs('superadmin.configure-hotel')])
+
                         @foreach (custom_module_plugins() as $item)
                             @includeIf(strtolower($item) . '::sections.superadmin-sidebar')
                         @endforeach

@@ -65,6 +65,8 @@ use App\Http\Controllers\SuperAdmin\RazorpayWebhookController;
 use App\Http\Controllers\SuperAdmin\FlutterwaveWebhookController;
 use App\Http\Middleware\CheckRestaurantPackage;
 use App\Http\Controllers\PosApiController;
+use App\Http\Controllers\HotelController;
+use App\Http\Controllers\ConfigureHotelController;
 
 Route::get('/manifest.json', [HomeController::class, 'manifest'])->name('manifest');
 
@@ -230,6 +232,10 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', SuperAd
         Route::put('custom-modules/{custom_module}', [CustomModuleController::class, 'update'])->withoutMiddleware('csrf')->name('custom-modules.update');
 
         Route::resource('landing-sites', LandingSiteController::class);
+
+        // Hotel Management Routes
+        Route::resource('hotels', HotelController::class);
+        Route::get('configure-hotel', [ConfigureHotelController::class, 'index'])->name('configure-hotel');
     });
 });
 
