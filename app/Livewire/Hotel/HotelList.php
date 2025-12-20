@@ -118,7 +118,7 @@ class HotelList extends Component
             // Handle logo upload
             if ($this->logo) {
                 $logoName = time() . '_' . $this->logo->getClientOriginalName();
-                $this->logo->storeAs('hotel-logos', $logoName, 'public');
+                $this->logo->storeAs('hotel-logos', $logoName);
                 $data['logo'] = $logoName;
             }
 
@@ -161,11 +161,11 @@ class HotelList extends Component
             if ($this->logo) {
                 // Delete old logo
                 if ($hotel->logo) {
-                    Storage::disk('public')->delete('hotel-logos/' . $hotel->logo);
+                    Storage::delete('hotel-logos/' . $hotel->logo);
                 }
 
                 $logoName = time() . '_' . $this->logo->getClientOriginalName();
-                $this->logo->storeAs('hotel-logos', $logoName, 'public');
+                $this->logo->storeAs('hotel-logos', $logoName);
                 $data['logo'] = $logoName;
             }
 
@@ -196,7 +196,7 @@ class HotelList extends Component
 
             // Delete logo
             if ($hotel->logo) {
-                Storage::disk('public')->delete('hotel-logos/' . $hotel->logo);
+                Storage::delete('user-uploads/hotel-logos/' . $hotel->logo);
             }
 
             $hotel->delete();

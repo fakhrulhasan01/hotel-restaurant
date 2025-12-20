@@ -48,4 +48,12 @@ class Hotel extends BaseModel
     {
         return $this->hasMany(HotelRoom::class)->orderBy('sort_order');
     }
+
+    /**
+     * Get all restaurants for this hotel
+     */
+    public function restaurants(): HasMany
+    {
+        return $this->hasMany(Restaurant::class);
+    }
 }

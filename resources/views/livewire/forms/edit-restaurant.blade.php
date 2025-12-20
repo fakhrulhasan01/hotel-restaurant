@@ -90,6 +90,17 @@
             <x-input-error for="country" class="mt-2" />
         </div>
 
+        <div class="mt-4">
+            <x-label for="hotelId" value="{{ __('Hotel') }}" />
+            <x-select id="hotelId" class="mt-1 block w-full" wire:model="hotelId">
+                <option value="">{{ __('Select Hotel (Optional)') }}</option>
+                @foreach ($hotels as $hotel)
+                <option value="{{ $hotel->id }}">{{ $hotel->name }}</option>
+                @endforeach
+            </x-select>
+            <x-input-error for="hotelId" class="mt-2" />
+        </div>
+
          <div class="mt-4">
                 <x-label for="facebook" value="{{ __('modules.settings.facebook_link') }}" />
                 <x-input id="facebook" class="block mt-1 w-full" type="url"

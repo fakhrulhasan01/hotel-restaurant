@@ -51,7 +51,7 @@
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800">
                             @forelse($hotels as $hotel)
-                            <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <tr wire:key="hotel-{{ $hotel->id }}" class="hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
                                     <div class="flex items-center">
                                         @if($hotel->logo)
@@ -125,7 +125,7 @@
     </div>
 
     <!-- Add Hotel Modal -->
-    <x-modal wire:model.live="showAddHotel" maxWidth="2xl">
+    <x-modal id="addHotelModal" wire:model.live="showAddHotel" maxWidth="2xl">
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">
@@ -209,7 +209,8 @@
     </x-modal>
 
     <!-- Edit Hotel Modal -->
-    <x-modal wire:model.live="showEditHotel" maxWidth="2xl">
+    @if ($editingHotelId)
+    <x-modal id="editHotelModal" wire:model.live="showEditHotel" maxWidth="2xl">
         <div class="p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">
@@ -296,4 +297,5 @@
             </form>
         </div>
     </x-modal>
+    @endif
 </div>

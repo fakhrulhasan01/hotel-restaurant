@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Country;
 use Livewire\Component;
 use App\Models\Restaurant;
+use App\Models\Hotel;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class EditRestaurant extends Component
@@ -24,8 +25,10 @@ class EditRestaurant extends Component
     public $instagram;
     public $twitter;
     public $countries;
+    public $hotels;
     public $restaurant;
     public $isActive;
+    public $hotelId;
     public $sub_domain;
     public $domain;
     public $phoneCodeSearch = '';
@@ -51,6 +54,7 @@ class EditRestaurant extends Component
         $defaultCountry = Country::where('countries_code', $ipCountry)->first();
 
         $this->countries = Country::select('id', 'countries_name')->get();
+        $this->hotels = Hotel::where('is_active', true)->orderBy('name')->get();
 
         $this->restaurantName = $this->restaurant->name;
         $this->email = $this->restaurant->email;
@@ -58,6 +62,7 @@ class EditRestaurant extends Component
         $this->phoneCode = $this->restaurant->phone_code;
         $this->address = $this->restaurant->address;
         $this->country = $this->restaurant->country_id;
+        $this->hotelId = $this->restaurant->hotel_id;
         $this->facebook = $this->restaurant->facebook_link;
         $this->instagram = $this->restaurant->instagram_link;
         $this->twitter = $this->restaurant->twitter_link;
@@ -129,6 +134,7 @@ class EditRestaurant extends Component
         $this->restaurant->phone_number = $this->phone;
         $this->restaurant->phone_code = $this->phoneCode;
         $this->restaurant->country_id = $this->country;
+        $this->restaurant->hotel_id = $this->hotelId;
         $this->restaurant->facebook_link = $this->facebook;
         $this->restaurant->instagram_link = $this->instagram;
         $this->restaurant->twitter_link = $this->twitter;

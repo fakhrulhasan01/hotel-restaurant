@@ -112,19 +112,20 @@
                     dark:[&::-webkit-scrollbar-track]:bg-gray-700
                     dark:[&::-webkit-scrollbar-thumb]:bg-gray-500
                     dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
+                wire:init
                 x-data="{
-                    loadedCount: @entangle('menuItemsLoaded'),
+                    loadedCount: @entangle('menuItemsLoaded').live,
                     totalCount: {{ $this->totalMenuItemsCount }},
-                    
+
                     get allItemsLoaded() {
                         return this.loadedCount >= this.totalCount;
                     },
-                    
+
                     scrollHandler() {
                         if (this.allItemsLoaded) {
                             return;
                         }
-                        
+
                         const scrollableDiv = $el;
                         if (scrollableDiv.scrollHeight - scrollableDiv.scrollTop <= scrollableDiv.clientHeight + 250) {
                             $wire.loadMoreMenuItems();
@@ -216,7 +217,7 @@
                     </li>
                 @endforelse
                 </ul>
-                
+
                 <div class="flex items-center justify-center py-6 px-4">
                     @if(!$this->allItemsLoaded)
                         <div wire:loading wire:target="loadMoreMenuItems" class="flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400">

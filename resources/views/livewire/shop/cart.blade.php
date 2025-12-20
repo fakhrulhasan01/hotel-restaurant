@@ -398,8 +398,9 @@
 
     @if ($showMenu && !$showOrderTypeModal)
         <div class="px-4 mb-32 space-y-4 lg:gap-8"
+            wire:init
             x-data="{
-                loadedCount: @entangle('menuItemsLoaded'),
+                loadedCount: @entangle('menuItemsLoaded').live,
                 totalCount: {{ $this->totalMenuItemsCount }},
                 isLoading: false,
 

@@ -153,7 +153,7 @@ class RoomsTab extends Component
                 $uploadedPictures = [];
                 foreach ($this->pictures as $picture) {
                     $pictureName = time() . '_' . uniqid() . '_' . $picture->getClientOriginalName();
-                    $picture->storeAs('hotel-rooms', $pictureName, 'public');
+                    $picture->storeAs('hotel-rooms', $pictureName);
                     $uploadedPictures[] = $pictureName;
                 }
                 $data['pictures'] = $uploadedPictures;
@@ -198,7 +198,7 @@ class RoomsTab extends Component
             if (!empty($this->pictures)) {
                 foreach ($this->pictures as $picture) {
                     $pictureName = time() . '_' . uniqid() . '_' . $picture->getClientOriginalName();
-                    $picture->storeAs('hotel-rooms', $pictureName, 'public');
+                    $picture->storeAs('hotel-rooms', $pictureName);
                     $allPictures[] = $pictureName;
                 }
             }
@@ -207,7 +207,7 @@ class RoomsTab extends Component
             if ($room->pictures) {
                 $removedPictures = array_diff($room->pictures, $this->existing_pictures);
                 foreach ($removedPictures as $removedPicture) {
-                    Storage::disk('public')->delete('hotel-rooms/' . $removedPicture);
+                    Storage::delete('hotel-rooms/' . $removedPicture);
                 }
             }
 
@@ -243,7 +243,7 @@ class RoomsTab extends Component
             // Delete pictures
             if ($room->pictures) {
                 foreach ($room->pictures as $picture) {
-                    Storage::disk('public')->delete('hotel-rooms/' . $picture);
+                    Storage::delete('hotel-rooms/' . $picture);
                 }
             }
 

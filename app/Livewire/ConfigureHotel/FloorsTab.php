@@ -106,7 +106,7 @@ class FloorsTab extends Component
             // Handle picture upload
             if ($this->picture) {
                 $pictureName = time() . '_' . $this->picture->getClientOriginalName();
-                $this->picture->storeAs('hotel-floors', $pictureName, 'public');
+                $this->picture->storeAs('hotel-floors', $pictureName);
                 $data['picture'] = $pictureName;
             }
 
@@ -140,11 +140,11 @@ class FloorsTab extends Component
             if ($this->picture) {
                 // Delete old picture
                 if ($floor->picture) {
-                    Storage::disk('public')->delete('hotel-floors/' . $floor->picture);
+                    Storage::delete('hotel-floors/' . $floor->picture);
                 }
 
                 $pictureName = time() . '_' . $this->picture->getClientOriginalName();
-                $this->picture->storeAs('hotel-floors', $pictureName, 'public');
+                $this->picture->storeAs('hotel-floors', $pictureName);
                 $data['picture'] = $pictureName;
             }
 
@@ -176,7 +176,7 @@ class FloorsTab extends Component
 
             // Delete picture
             if ($floor->picture) {
-                Storage::disk('public')->delete('hotel-floors/' . $floor->picture);
+                Storage::delete('hotel-floors/' . $floor->picture);
             }
 
             $floor->delete();

@@ -79,6 +79,11 @@ class Restaurant extends BaseModel
         return $this->belongsTo(Country::class);
     }
 
+    public function hotel(): BelongsTo
+    {
+        return $this->belongsTo(Hotel::class);
+    }
+
     public function branches(): HasMany
     {
         return $this->hasMany(Branch::class)->withoutGlobalScopes();
