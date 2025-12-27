@@ -198,6 +198,48 @@ class EditBookingForm extends Component
             'rooms' => 'required|array|min:1',
         ]);
 
+        // Check for room conflicts (excluding current booking)
+        $roomIds = collect($this->rooms)->pluck('room_id')->toArray();
+
+        $conflictingBookings = HotelBooking::where('hotel_id', $this->hotel_id)
+            ->where('id', '!=', $this->bookingId)  // Exclude current booking
+            ->whereIn('status', ['pending', 'confirmed', 'checked-in'])
+            ->where(function ($query) {
+                $query->whereBetween('checkin_date', [$this->checkin_date, $this->checkout_date])
+                    ->orWhereBetween('checkout_date', [$this->checkin_date, $this->checkout_date])
+                    ->orWhere(function ($q) {
+                        $q->where('checkin_date', '<=', $this->checkin_date)
+                          ->where('checkout_date', '>=', $this->checkout_date);
+                    });
+            })
+            ->whereHas('bookingRooms', function ($q) use ($roomIds) {
+                $q->whereIn('room_id', $roomIds);
+            })
+            ->with(['bookingRooms.room.floor'])
+            ->get();
+
+        if ($conflictingBookings->isNotEmpty()) {
+            $conflictDetails = [];
+            foreach ($conflictingBookings as $booking) {
+                foreach ($booking->bookingRooms as $bookingRoom) {
+                    if (in_array($bookingRoom->room_id, $roomIds)) {
+                        $conflictDetails[] = $bookingRoom->room->floor->name . ' > ' .
+                            $bookingRoom->room->name . ' (Booked: ' .
+                            date('M d, Y', strtotime($booking->checkin_date)) . ' - ' .
+                            date('M d, Y', strtotime($booking->checkout_date)) . ')';
+                    }
+                }
+            }
+
+            $this->alert('error', 'Room(s) already booked for selected dates: ' . implode(', ', $conflictDetails), [
+                'toast' => false,
+                'position' => 'center',
+                'timer' => 5000,
+            ]);
+
+            return;
+        }
+
         // Update booking
         $booking = HotelBooking::findOrFail($this->bookingId);
         $booking->update([

@@ -3,48 +3,48 @@
         <ul class="flex flex-wrap -mb-px">
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index') }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index') }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'app'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'app')])>@lang('modules.settings.appSettings')</a>
             </li>
 
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=email' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=email' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'email'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'email')])>@lang('modules.settings.emailSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=language' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=language' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'language'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'language')])>@lang('modules.settings.languageSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=payment' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=payment' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'payment'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'payment')])>@lang('modules.settings.paymentgatewaySettings')</a>
             </li>
 
               <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=theme' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=theme' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'theme'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'theme')])>@lang('modules.settings.themeSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=push' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=push' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'push'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'push')])>@lang('modules.settings.pushNotificationSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=currency' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=currency' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'currency'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'currency')])>@lang('modules.settings.currencySettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=storage' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=storage' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'storage'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'storage')])>@lang('modules.settings.storageSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=desktop-app' }}" wire:navigate
+                <a href="{{ route('superadmin.superadmin-settings.index').'?tab=desktop-app' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'desktop-app'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'desktop-app')])>@lang('Desktop Application')</a>
             </li>
 

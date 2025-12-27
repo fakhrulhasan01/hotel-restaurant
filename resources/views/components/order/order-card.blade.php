@@ -2,7 +2,7 @@
     'flex-col gap-3 items-center border bg-white shadow-sm rounded-lg hover:shadow-md transition dark:bg-gray-700 dark:border-gray-600 p-3',
 ])>
     <a @class(['group flex flex-col gap-3 items-center '])
-        @if ($order->status == 'kot') href="{{ route('pos.kot', $order->id).'?show-order-detail=true' }}" wire:navigate
+        @if ($order->status == 'kot') href="{{ route('pos.kot', $order->id).'?show-order-detail=true' }}"
         @else wire:click="$dispatch('showOrderDetail', { id: {{ $order->id }} })" @endif
         wire:key='order-item-{{ $order->id . microtime() }}' href="javascript:;">
         <div class="flex gap-4 justify-between  w-full">

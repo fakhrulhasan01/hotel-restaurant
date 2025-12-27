@@ -331,7 +331,7 @@
                                 Saving...
                             </span>
                         </x-button>
-                        <x-secondary-link href="{{ route('modifier-groups.index') }}" wire:navigate wire:loading.attr="disabled" wire:target="submitForm" class="flex-1">@lang('app.cancel')
+                        <x-secondary-link href="{{ route('modifier-groups.index') }}" wire:loading.attr="disabled" wire:target="submitForm" class="flex-1">@lang('app.cancel')
                         </x-secondary-link>
                     </div>
                 </div>

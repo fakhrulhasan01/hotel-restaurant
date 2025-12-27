@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-                    <a href="{{ route('hotel-bookings.create') }}" wire:navigate
+                    <a href="{{ route('hotel-bookings.create') }}"
                         class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                         <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg">
@@ -123,7 +123,7 @@
                                     ${{ number_format($booking->price, 2) }}
                                 </td>
                                 <td class="py-2.5 px-4 space-x-2 whitespace-nowrap text-right">
-                                    <a href="{{ route('hotel-bookings.edit', $booking->id) }}" wire:navigate>
+                                    <a href="{{ route('hotel-bookings.edit', $booking->id) }}">
                                         <x-secondary-button-table>
                                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>

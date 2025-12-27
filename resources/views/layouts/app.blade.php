@@ -31,8 +31,12 @@
 
     <title>{{ global_setting()->name }}</title>
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Temporary Alpine stub to prevent "Alpine is not defined" before Livewire loads -->
+    <script>
+        window.Alpine = window.Alpine || {
+            navigate: { disableProgressBar: function(){} }
+        };
+    </script>
 
     <!-- Styles -->
     @livewireStyles
@@ -135,12 +139,15 @@
 
     @stack('modals')
 
-
-    @livewireScripts
+    <!-- Livewire auto-injects its scripts (with Alpine) when inject_assets=true -->
+    <!-- Vite assets for our custom CSS/JS -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @include('layouts.update-uri')
 
-    @livewire('raise-support-ticket')
+    @persist('support-ticket')
+        @livewire('raise-support-ticket')
+    @endpersist
 
     <script src="{{ asset('vendor/livewire-alert/livewire-alert.js') }}" defer data-navigate-track></script>
     <x-livewire-alert::flash />
@@ -150,14 +157,13 @@
     @endif
 
     @if (user()->restaurant_id)
+        @persist('global-modals')
+            @livewire('order.OrderDetail')
 
-        @livewire('order.OrderDetail')
+            @livewire('customer.addCustomer')
 
-        @livewire('customer.addCustomer')
-
-        {{-- @livewire('settings.upgradeLicense') --}}
-
-        @livewire('order.addPayment')
+            @livewire('order.addPayment')
+        @endpersist
 
         @include('sections.payment-gateway-include')
 

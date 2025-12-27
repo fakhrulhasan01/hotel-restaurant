@@ -21,6 +21,8 @@ class UpgradeLicense extends Component
     public function mount()
     {
         $this->credential = SuperadminPaymentGateway::first();
+        // Force modal to stay closed
+        $this->showUpgradeModal = false;
     }
 
     #[On('showUpgradeLicense')]

@@ -14,7 +14,7 @@
                     </form>
                 </div>
 
-                <x-primary-link href="{{ route('modifier-groups.create') }}" wire:navigate>
+                <x-primary-link href="{{ route('modifier-groups.create') }}">
                     @lang('modules.modifier.addModifierGroup')
                 </x-primary-link>
             </div>
@@ -51,7 +51,7 @@
                                     @endforelse
                                 </td>
                                 <td class="py-2.5 px-4 space-x-2 whitespace-nowrap ltr:text-right rtl:text-left">
-                                    <x-secondary-link href="{{ route('modifier-groups.edit', $group->id) }}" wire:navigate>
+                                    <x-secondary-link href="{{ route('modifier-groups.edit', $group->id) }}">
                                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.414 2.586a2 2 0 0 0-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 0 0 0-2.828"/><path fill-rule="evenodd" d="M2 6a2 2 0 0 1 2-2h4a1 1 0 0 1 0 2H4v10h10v-4a1 1 0 1 1 2 0v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" clip-rule="evenodd"/></svg>
                                         @lang('app.update')
                                     </x-secondary-link>

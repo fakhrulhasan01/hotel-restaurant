@@ -21,7 +21,7 @@
                     <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0 rtl:space-x-reverse">
                         <li>
                             <a href="{{ route('shop_restaurant', [$restaurant->hash]) . '?branch=' . $shopBranch->id }}"
-                                wire:navigate @class([
+                                @class([
                                     'block py-2 pr-4 pl-3 rounded bg-primary-700 lg:bg-transparent lg:p-0',
                                     'dark:text-white text-gray-700' => !request()->routeIs(['home']),
                                     'dark:text-skin-base text-skin-base' => request()->routeIs(['home']),
@@ -31,7 +31,7 @@
                         @if (in_array('Table Reservation', $modules))
                             <li>
                                 <a href="{{ route('book_a_table', [$restaurant->hash]) . '?branch=' . $shopBranch->id }}"
-                                    wire:navigate @class([
+                                    @class([
                                         'block py-2 pr-4 pl-3 rounded lg:bg-transparent lg:p-0',
                                         'text-gray-700 dark:text-white' => !request()->routeIs(['book_a_table']),
                                         'dark:text-skin-base text-skin-base' => request()->routeIs([
@@ -43,7 +43,7 @@
 
                         <li>
                             <a href="{{ route('about', [$restaurant->hash]) . '?branch=' . $shopBranch->id }}"
-                                wire:navigate @class([
+                                @class([
                                     'block py-2 pr-4 pl-3 rounded lg:bg-transparent lg:p-0',
                                     'text-gray-700 dark:text-white' => !request()->routeIs(['about']),
                                     'dark:text-skin-base text-skin-base' => request()->routeIs(['about']),
@@ -51,7 +51,7 @@
                         </li>
                         <li>
                             <a href="{{ route('contact', [$restaurant->hash]) . '?branch=' . $shopBranch->id }}"
-                                wire:navigate @class([
+                                @class([
                                     'block py-2 pr-4 pl-3 rounded lg:bg-transparent lg:p-0',
                                     'text-gray-700 dark:text-white' => !request()->routeIs(['contact']),
                                     'dark:text-skin-base text-skin-base' => request()->routeIs(['contact']),
@@ -122,20 +122,20 @@
                         class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownLargeButton">
                             <li>
-                                <a href="{{ route('profile', [$restaurant->hash]) }}" wire:navigate
+                                <a href="{{ route('profile', [$restaurant->hash]) }}"
                                     class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">@lang('menu.profile')</a>
                             </li>
                             <li>
-                                <a href="{{ route('my_addresses', [$restaurant->hash]) }}" wire:navigate
+                                <a href="{{ route('my_addresses', [$restaurant->hash]) }}"
                                     class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">@lang('menu.myAddresses')</a>
                             </li>
                             <li>
-                                <a href="{{ route('my_orders', [$restaurant->hash]) }}" wire:navigate
+                                <a href="{{ route('my_orders', [$restaurant->hash]) }}"
                                     class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">@lang('menu.myOrders')</a>
                             </li>
                             @if (in_array('Table Reservation', $modules))
                                 <li>
-                                    <a href="{{ route('my_bookings', [$restaurant->hash]) }}" wire:navigate
+                                    <a href="{{ route('my_bookings', [$restaurant->hash]) }}"
                                         class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">@lang('menu.myBookings')</a>
                                 </li>
                             @endif

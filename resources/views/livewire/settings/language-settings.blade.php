@@ -123,7 +123,7 @@
                                                 <div class="mb-1">@lang('modules.language.modifyDefaultLanguage')
 
                                                     <a href='{{ route('superadmin.superadmin-settings.index') }}'
-                                                          wire:navigate class="text-blue-600 hover:underline dark:text-blue-400"
+                                                          class="text-blue-600 hover:underline dark:text-blue-400"
                                                      target="_blank"
                                                       tabindex="0">@lang('modules.settings.appSettings')
                                                     </a>

@@ -1,5 +1,9 @@
 import "./bootstrap";
+
+// Alpine.js is bundled with Livewire 3 - DO NOT import or start it manually
+
 import "flowbite";
+
 // import './sidebar';
 // import './sidebar';
 // import './charts';

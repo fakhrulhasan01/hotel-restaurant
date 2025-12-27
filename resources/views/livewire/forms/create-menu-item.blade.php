@@ -284,7 +284,7 @@
                                 Saving...
                             </span>
                         </x-button>
-                        <x-secondary-link href="{{ route('menu-items.index') }}" wire:navigate wire:loading.attr="disabled" wire:target="submitForm"
+                        <x-secondary-link href="{{ route('menu-items.index') }}" wire:loading.attr="disabled" wire:target="submitForm"
                             class="flex-1">@lang('app.cancel')</x-secondary-link>
                     </div>
                 </div>
@@ -797,7 +797,7 @@
                                 Saving...
                             </span>
                         </x-button>
-                        <x-secondary-link href="{{ route('menu-items.index') }}" wire:navigate wire:loading.attr="disabled" wire:target="submitForm"
+                        <x-secondary-link href="{{ route('menu-items.index') }}" wire:loading.attr="disabled" wire:target="submitForm"
                             class="flex-1 text-center">@lang('app.cancel')</x-secondary-link>
                     </div>
                 </div>

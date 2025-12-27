@@ -95,30 +95,30 @@
                 <ul class="flex flex-col font-medium ">
                     @if ($restaurant->allow_customer_orders)
                     <li>
-                        <a href="{{ route('shop_restaurant', [$restaurant->hash]) }}" wire:navigate class="block py-2 pr-4 pl-3 text-gray-700 rounded   dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-700" >@lang('menu.newOrder')</a>
+                        <a href="{{ route('shop_restaurant', [$restaurant->hash]) }}" class="block py-2 pr-4 pl-3 text-gray-700 rounded   dark:text-white dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-700" >@lang('menu.newOrder')</a>
                     </li>
                     @endif
                     @if (in_array('Table Reservation', $modules))
                     <li>
-                        <a href="{{ route('book_a_table', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" wire:navigate class="block py-2 pr-4 pl-3 text-gray-700 rounded dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-800" >@lang('menu.bookTable')</a>
+                        <a href="{{ route('book_a_table', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" class="block py-2 pr-4 pl-3 text-gray-700 rounded dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:bg-gray-800" >@lang('menu.bookTable')</a>
                     </li>
                     @endif
                     @if (!is_null(customer()))
                     <li>
-                        <a href="{{ route('my_addresses', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" wire:navigate class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700">@lang('menu.myAddresses')</a>
+                        <a href="{{ route('my_addresses', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:border-gray-700">@lang('menu.myAddresses')</a>
                     </li>
                     <li>
-                        <a href="{{ route('my_orders', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" wire:navigate class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50  dark:text-gray-400  dark:hover:bg-gray-700 dark:hover:text-white  dark:border-gray-700 ">@lang('menu.myOrders')</a>
+                        <a href="{{ route('my_orders', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50  dark:text-gray-400  dark:hover:bg-gray-700 dark:hover:text-white  dark:border-gray-700 ">@lang('menu.myOrders')</a>
                     </li>
 
                     @if (in_array('Table Reservation', $modules))
                     <li>
-                        <a href="{{ route('my_bookings', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" wire:navigate class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50  dark:text-gray-400  dark:hover:bg-gray-700 dark:hover:text-white  dark:border-gray-700">@lang('menu.myBookings')</a>
+                        <a href="{{ route('my_bookings', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50  dark:text-gray-400  dark:hover:bg-gray-700 dark:hover:text-white  dark:border-gray-700">@lang('menu.myBookings')</a>
                     </li>
                     @endif
 
                     <li>
-                        <a href="{{ route('profile', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" wire:navigate class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50  dark:text-gray-400  dark:hover:bg-gray-700 dark:hover:text-white  dark:border-gray-700">@lang('menu.profile')</a>
+                        <a href="{{ route('profile', [$restaurant->hash]).'?branch=' . $shopBranch->id }}" class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50  dark:text-gray-400  dark:hover:bg-gray-700 dark:hover:text-white  dark:border-gray-700">@lang('menu.profile')</a>
                     </li>
 
                     <li>

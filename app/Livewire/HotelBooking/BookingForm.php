@@ -94,7 +94,7 @@ class BookingForm extends Component
 
         // Get booked room IDs for the date range
         $bookedRoomIds = HotelBooking::where('hotel_id', $this->hotel_id)
-            ->whereIn('status', ['confirmed', 'checked-in'])
+            ->whereIn('status', ['pending', 'confirmed', 'checked-in'])
             ->where(function ($query) {
                 $query->whereBetween('checkin_date', [$this->checkin_date, $this->checkout_date])
                     ->orWhereBetween('checkout_date', [$this->checkin_date, $this->checkout_date])
@@ -174,6 +174,44 @@ class BookingForm extends Component
             'status' => 'required|in:pending,confirmed,checked-in,checked-out,cancelled',
             'rooms' => 'required|array|min:1',
         ]);
+
+        // Check for room conflicts
+        $roomIds = collect($this->rooms)->pluck('room_id')->toArray();
+
+        $conflictingBookings = HotelBooking::where('hotel_id', $this->hotel_id)
+            ->whereIn('status', ['pending', 'confirmed', 'checked-in'])
+            ->where(function ($query) {
+                $query->whereBetween('checkin_date', [$this->checkin_date, $this->checkout_date])
+                    ->orWhereBetween('checkout_date', [$this->checkin_date, $this->checkout_date])
+                    ->orWhere(function ($q) {
+                        $q->where('checkin_date', '<=', $this->checkin_date)
+                          ->where('checkout_date', '>=', $this->checkout_date);
+                    });
+            })
+            ->whereHas('bookingRooms', function ($q) use ($roomIds) {
+                $q->whereIn('room_id', $roomIds);
+            })
+            ->with(['bookingRooms.room.floor'])
+            ->get();
+
+        if ($conflictingBookings->isNotEmpty()) {
+            $conflictDetails = [];
+            foreach ($conflictingBookings as $booking) {
+                foreach ($booking->bookingRooms as $bookingRoom) {
+                    if (in_array($bookingRoom->room_id, $roomIds)) {
+                        $conflictDetails[] = $bookingRoom->room->floor->name . ' > ' . $bookingRoom->room->name . ' (Booked: ' . date('M d, Y', strtotime($booking->checkin_date)) . ' - ' . date('M d, Y', strtotime($booking->checkout_date)) . ')';
+                    }
+                }
+            }
+
+            $this->alert('error', 'Room(s) already booked for selected dates: ' . implode(', ', $conflictDetails), [
+                'toast' => false,
+                'position' => 'center',
+                'timer' => 5000,
+            ]);
+
+            return;
+        }
 
         // Create booking
         $booking = HotelBooking::create([

@@ -114,7 +114,7 @@
                 $orderLimitExceeded = $canCreateOrder && $orderStats && !$orderStats['unlimited'] && $orderStats['current_count'] >= $orderStats['order_limit'];
             @endphp
             @if($canCreateOrder && $orderStats && ($orderStats['unlimited'] || $orderStats['current_count'] < $orderStats['order_limit']))
-                <x-primary-link wire:navigate href="{{ route('pos.index') }}">@lang('modules.order.newOrder')</x-primary-link>
+                <x-primary-link href="{{ route('pos.index') }}">@lang('modules.order.newOrder')</x-primary-link>
             @endif
 
            

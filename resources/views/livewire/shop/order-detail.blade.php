@@ -663,7 +663,7 @@
                     @lang('modules.order.paid')
                 </x-alert>
 
-                <x-secondary-link wire:navigate class="inline-flex items-center justify-center w-1/2 gap-2" href="{{ $newOrderLink }}">
+                <x-secondary-link class="inline-flex items-center justify-center w-1/2 gap-2" href="{{ $newOrderLink }}">
                     @lang('modules.order.newOrder')
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -700,7 +700,7 @@
                                 @endif
 
                             @endif
-                            <x-secondary-link wire:navigate class="inline-flex items-center justify-center gap-2" href="{{ $newOrderLink }}">
+                            <x-secondary-link class="inline-flex items-center justify-center gap-2" href="{{ $newOrderLink }}">
                                 @lang('modules.order.newOrder')
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />

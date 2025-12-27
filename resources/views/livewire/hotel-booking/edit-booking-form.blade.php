@@ -190,7 +190,7 @@
 
             {{-- Submit Buttons --}}
             <div class="flex justify-end gap-3">
-                <a href="{{ route('hotel-bookings.index') }}" wire:navigate>
+                <a href="{{ route('hotel-bookings.index') }}">
                     <x-secondary-button type="button">
                         Cancel
                     </x-secondary-button>

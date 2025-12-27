@@ -4,92 +4,92 @@
             @if (user()->hasRole('Admin_'.user()->restaurant_id))
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=restaurant' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=restaurant' }}"
                     @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'restaurant'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'restaurant')])>
                     @lang('modules.settings.restaurantSettings')
                 </a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=app' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=app' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'app'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'app')])>@lang('modules.settings.appSettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=branch' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=branch' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'branch'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'branch')])>@lang('modules.settings.branchSettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=currency' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=currency' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'currency'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'currency')])>@lang('modules.settings.currencySettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=email' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=email' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'email'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'email')])>@lang('modules.settings.emailSettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=tax' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=tax' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'tax'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'tax')])>@lang('modules.settings.taxSettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=payment' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=payment' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'payment'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'payment')])>@lang('modules.settings.paymentgatewaySettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=theme' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=theme' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'theme'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'theme')])>@lang('modules.settings.themeSettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=role' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=role' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'role'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'role')])>@lang('modules.settings.roleSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=billing' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=billing' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'billing'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'billing')])>@lang('modules.settings.billing')</a>
             </li>
 
             @endif
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=reservation' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=reservation' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'reservation'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'reservation')])>@lang('modules.settings.reservationSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=aboutus' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=aboutus' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'aboutus'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'aboutus')])>@lang('modules.settings.aboutUsSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=customerSite' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=customerSite' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'customerSite'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'customerSite')])>@lang('modules.settings.customerSiteSettings')</a>
             </li>
 
               <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=receipt' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=receipt' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'receipt'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'receipt')])>@lang('modules.settings.receiptSetting')</a>
             </li>
 
              <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=printer' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=printer' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'printer'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'printer')])>@lang('modules.settings.printerSetting')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=deliverySettings' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=deliverySettings' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'deliverySettings'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'deliverySettings')])>@lang('modules.settings.deliverySettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=kotSettings' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=kotSettings' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'kotSettings'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'kotSettings')])>@lang('modules.settings.kotSettings')</a>
             </li>
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=cancelSettings' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=cancelSettings' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'cancelSettings'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'cancelSettings')])>@lang('modules.settings.cancelSettings')</a>
             </li>
 
             <li class="me-2">
-                <a href="{{ route('settings.index').'?tab=orderSettings' }}" wire:navigate
+                <a href="{{ route('settings.index').'?tab=orderSettings' }}"
                 @class(["inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300", 'border-transparent' => ($activeSetting != 'orderSettings'), 'active border-skin-base dark:text-skin-base dark:border-skin-base text-skin-base' => ($activeSetting == 'orderSettings')])>@lang('modules.settings.orderSetting')</a>
             </li>
 

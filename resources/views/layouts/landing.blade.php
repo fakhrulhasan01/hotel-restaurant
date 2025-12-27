@@ -113,7 +113,7 @@
                             @endforeach
 
                             <li>
-                                <a href="{{ route('login') }}" wire:navigate
+                                <a href="{{ route('login') }}"
                                     class="block py-2 pr-4 pl-3 text-gray-700 rounded dark:text-white">
                                     @if (user())
                                         @lang('menu.dashboard')
@@ -124,7 +124,7 @@
                             </li>
 
                             <li>
-                                <a href="{{ route('restaurant_signup') }}" wire:navigate
+                                <a href="{{ route('restaurant_signup') }}"
                                     class="block py-2 pr-4 pl-3 text-gray-700 rounded dark:text-white">@lang('landing.getStarted')</a>
                             </li>
                         </ul>
@@ -194,7 +194,7 @@
                         <ul
                             class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0 rtl:space-x-reverse">
                             <li>
-                                <a href="{{ url('/') }}" wire:navigate @class([
+                                <a href="{{ url('/') }}" @class([
                                     'block py-2 pr-4 pl-3 rounded bg-red-700 lg:bg-transparent lg:p-0',
                                     'dark:text-white text-gray-700' => !request()->routeIs(['home']),
                                     'dark:text-skin-base text-skin-base' => request()->routeIs(['home']),

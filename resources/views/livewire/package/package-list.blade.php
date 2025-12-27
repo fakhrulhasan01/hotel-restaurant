@@ -24,7 +24,7 @@
                         </form>
                     </div>
 
-                    <x-primary-link href="{{ route('superadmin.packages.create') }}" wire:navigate class="text-sm font-medium text-blue-600 hover:underline">@lang('modules.package.addPackage')</x-primary-button>
+                    <x-primary-link href="{{ route('superadmin.packages.create') }}" class="text-sm font-medium text-blue-600 hover:underline">@lang('modules.package.addPackage')</x-primary-button>
 
                 </div>
             </div>

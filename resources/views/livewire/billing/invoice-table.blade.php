@@ -56,7 +56,7 @@
                             </td>
                             <td class="py-2.5 px-4 text-sm text-gray-900 whitespace-nowrap dark:text-white">
                                 @if ($invoice->restaurant)
-                                    <a href="{{ route('superadmin.restaurants.show', $invoice->restaurant->hash) }}" class="underline underline-offset-1 font-medium" wire:navigate>
+                                    <a href="{{ route('superadmin.restaurants.show', $invoice->restaurant->hash) }}" class="underline underline-offset-1 font-medium">
                                         {{ \Illuminate\Support\Str::limit($invoice->restaurant->name, 25, '...') }}
                                     </a>
                                 @else

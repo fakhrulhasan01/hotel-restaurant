@@ -29,7 +29,7 @@
                 </span>
 
                 <p class="ms-3 font-medium text-sm text-white truncate" x-text="message"></p>
-                <a x-show="link" :href="link" wire:navigate class="ml-2 text-sm font-semibold text-white underline hover:no-underline">View</a>
+                <a x-show="link" :href="link" class="ml-2 text-sm font-semibold text-white underline hover:no-underline">View</a>
             </div>
 
             <div class="shrink-0 sm:ms-3">
