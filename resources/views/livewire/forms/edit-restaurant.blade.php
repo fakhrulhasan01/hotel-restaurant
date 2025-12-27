@@ -21,7 +21,7 @@
                 value="{{ __('modules.settings.restaurantPhoneNumber') }}" />
             <div class="flex gap-2 mt-2">
                 <!-- Phone Code Dropdown -->
-                <div x-data="{ isOpen: @entangle('phoneCodeIsOpen').live }" @click.away="isOpen = false" class="relative w-32">
+                <div x-data="{ isOpen: false }" @click.away="isOpen = false" class="relative w-32">
                     <div @click="isOpen = !isOpen"
                         class="p-2 bg-gray-100 border rounded cursor-pointer dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-gray-600 dark:focus:ring-gray-600">
                         <div class="flex items-center justify-between">
@@ -44,7 +44,7 @@
                             <x-input wire:model.live.debounce.300ms="phoneCodeSearch" class="block w-full" type="text" placeholder="{{ __('placeholders.search') }}" />
                         </li>
                         @forelse ($phonecodes as $phonecode)
-                            <li @click="$wire.selectPhoneCode('{{ $phonecode }}')"
+                            <li @click="$wire.selectPhoneCode('{{ $phonecode }}'); isOpen = false"
                                 wire:key="phone-code-{{ $phonecode }}"
                                 class="relative py-2 pl-3 text-gray-900 transition-colors duration-150 cursor-pointer select-none pr-9 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 dark:focus:border-gray-600 dark:focus:ring-gray-600"
                                 :class="{ 'bg-gray-100 dark:bg-gray-800': '{{ $phonecode }}' === '{{ $phoneCode }}' }" role="option">

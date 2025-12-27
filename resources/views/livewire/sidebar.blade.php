@@ -31,6 +31,12 @@
 
                         @livewire('sidebar-menu-item', ['name' => __('menu.dashboard'), 'icon' => 'dashboard', 'link' => route('dashboard'), 'active' => request()->routeIs('dashboard')])
 
+                        {{-- Hotel Management Menu --}}
+                        <x-sidebar-dropdown-menu :name='"Hotel Management"' icon='menu' :active='request()->routeIs(["hotel-bookings.*"])'>
+                            @livewire('sidebar-dropdown-menu', ['name' => 'Add Booking', 'link' => route('hotel-bookings.create'), 'active' => request()->routeIs('hotel-bookings.create')])
+                            @livewire('sidebar-dropdown-menu', ['name' => 'Bookings', 'link' => route('hotel-bookings.index'), 'active' => request()->routeIs('hotel-bookings.index')])
+                        </x-sidebar-dropdown-menu>
+
                         @if ($this->hasModule('Menu') || $this->hasModule('Menu Item') || $this->hasModule('Item Category'))
                             @if (user_can('Show Menu') || user_can('Show Menu Item') || user_can('Show Item Category'))
                                 <x-sidebar-dropdown-menu :name='__("menu.menu")' icon='menu' :active='request()->routeIs(["menus.*", "menu-items.*", "item-categories.*", "item-modifiers.*", "modifier-groups.*"])'>

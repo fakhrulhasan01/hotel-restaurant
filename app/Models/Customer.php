@@ -28,6 +28,11 @@ class Customer extends BaseModel
         return $this->hasMany(CustomerAddress::class)->orderBy('id', 'desc');
     }
 
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(HotelBooking::class);
+    }
+
     public function routeNotificationForVonage($notification)
     {
         if (!is_null($this->phone) && !is_null($this->phone_code)) {

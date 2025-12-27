@@ -33,7 +33,7 @@
 
                 <div class="flex gap-2 mt-2">
                     <!-- Phone Code Dropdown -->
-                    <div x-data="{ isOpen: @entangle('phoneCodeIsOpen').live }" @click.away="isOpen = false" class="relative w-32">
+                    <div x-data="{ isOpen: @entangle('phoneCodeIsOpen').live }" @click.away="isOpen = false" x-cloak class="relative w-32">
                         <div @click="!{{ $phoneVerified ? 'true' : 'false' }} && (isOpen = !isOpen)"
                             class="p-2 bg-gray-100 border rounded dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-gray-600 dark:focus:ring-gray-600" :class="{ 'cursor-pointer': !{{ $phoneVerified ? 'true' : 'false' }}, 'opacity-50 cursor-not-allowed': {{ $phoneVerified ? 'true' : 'false' }} }">
                             <div class="flex items-center justify-between">

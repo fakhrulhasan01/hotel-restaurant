@@ -155,7 +155,7 @@
 
         @livewire('customer.addCustomer')
 
-        @livewire('settings.upgradeLicense')
+        {{-- @livewire('settings.upgradeLicense') --}}
 
         @livewire('order.addPayment')
 

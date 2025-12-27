@@ -56,4 +56,12 @@ class Hotel extends BaseModel
     {
         return $this->hasMany(Restaurant::class);
     }
+
+    /**
+     * Get all bookings for this hotel
+     */
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(HotelBooking::class);
+    }
 }

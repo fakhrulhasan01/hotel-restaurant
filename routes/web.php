@@ -39,6 +39,7 @@ use App\Http\Controllers\ItemCategoryController;
 use App\Http\Controllers\ItemModifierController;
 use App\Http\Controllers\GlobalSettingController;
 use App\Http\Controllers\ModifierGroupController;
+use App\Http\Controllers\HotelBookingController;
 use App\Http\Controllers\PaypalPaymentController;
 use App\Http\Controllers\WaiterRequestController;
 use App\Http\Controllers\XenditPaymentController;
@@ -132,6 +133,9 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', VerifyR
     Route::get('account_unverified', [DashboardController::class, 'accountUnverified'])->name('account_unverified');
 
     Route::get('onboarding-steps', [OnboardingStepController::class, 'index'])->name('onboarding_steps');
+
+    // Hotel Bookings Routes
+    Route::resource('hotel-bookings', HotelBookingController::class);
 
     Route::resource('menus', MenuController::class);
     Route::get('menu-items/sort-entities', [MenuController::class, 'unifiedSort'])->name('menu-items.entities.sort');
