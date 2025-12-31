@@ -21,6 +21,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use App\Models\ItemCategory;
 use App\Models\ModifierOption;
 use App\Traits\PrinterSetting;
@@ -44,98 +45,163 @@ class Pos extends Component
 
     protected $listeners = ['refreshPos' => '$refresh', 'customerSelected' => 'setCustomer', 'setOrderTypeChoice', 'refreshPosOrder' => 'refreshOrderData'];
 
-
+    // User input properties (need to sync)
     public $search;
     public $filterCategories;
-    public $menuItem;
-    public $subTotal;
-    public $total;
-    public $orderNumber;
-    public $kotNumber;
-    public $tableNo;
-    public $tableId;
-    public $users;
     public $noOfPax = 1;
     public $selectWaiter;
-    public $taxes;
     public $orderNote;
-    public $tableOrder;
-    public $tableOrderID;
-    public $orderType;
-    public $orderTypeSlug;
-    public $kotList = [];
+    public $selectDeliveryExecutive;
+    public $discountType;
+    public $discountValue;
+    public $cancelReason;
+    public $cancelReasonText;
+    public $selectedDeliveryApp = null;
+    public $deliveryDateTime;
+    public $tipAmount = 0;
+    public $deliveryFee = 0;
+    public $customerId;
+    public $menuId;
+
+    // Modal states (need to sync)
     public $showVariationModal = false;
     public $showKotNote = false;
     public $showTableModal = false;
     public $showTableChangeConfirmationModal = false;
-    public $pendingTable = null;
     public $showErrorModal = true;
     public $showNewKotButton = false;
-    public $orderDetail = null;
     public $showReservationModal = false;
+    public $showDiscountModal = false;
+    public $showModifiersModal = false;
+    public $confirmDeleteModal = false;
+    public $deleteOrderModal = false;
+    public $allowOrderTypeSelection = false;
+
+    // Order state (need to sync)
+    public $orderItemList = [];
+    public $orderItemVariation = [];
+    public $orderItemQty = [];
+    public $orderItemAmount = [];
+    public $itemModifiersSelected = [];
+    public $orderItemModifiersPrice = [];
+    public $itemNotes = [];
+    public $kotList = [];
+
+    // Current order properties (need to sync)
+    public $orderID;
+    public $orderNumber;
+    public $formattedOrderNumber;
+    public $kotNumber;
+    public $tableNo;
+    public $tableId;
+    public $tableOrderID;
+    public $orderType;
+    public $orderTypeSlug;
+    public $orderTypeId;
+    public $orderStatus;
+    public $orderDetail = null;
+
+    // Modal helper state
+    public $pendingTable = null;
+    public $selectedModifierItem;
+    public $modifiers;
     public $reservationId = null;
     public $reservationCustomer = null;
     public $reservation = null;
     public $isSameCustomer = false;
     public $intendedOrderAction = null;
-    public $orderItemList = [];
-    public $orderItemVariation = [];
-    public $orderItemQty = [];
-    public $orderItemAmount = [];
-    public $deliveryExecutives;
-    public $selectDeliveryExecutive;
-    public $orderID;
-    public $discountType;
-    public $discountValue;
+
+    // Read-only / Server-computed properties (locked from client modification)
+    #[Locked]
+    public $menuItem;
+    #[Locked]
+    public $subTotal;
+    #[Locked]
+    public $total;
+    #[Locked]
+    public $tableOrder;
+    #[Locked]
     public $discountAmount;
+    #[Locked]
     public $restaurantSetting;
-    public $showDiscountModal = false;
-    public $selectedModifierItem;
-    public $modifiers;
-    public $showModifiersModal = false;
-    public $itemModifiersSelected = [];
-    public $orderItemModifiersPrice = [];
+    #[Locked]
     public $extraCharges;
+    #[Locked]
     public $discountedTotal;
-    public $tipAmount = 0;
-    public $orderStatus;
-    public $deliveryFee = 0;
-    public $itemNotes = [];
+    #[Locked]
     public $orderPlaces;
+    #[Locked]
     public $cancelReasons;
-    public $confirmDeleteModal = false;
-    public $deleteOrderModal = false;
-    public $cancelReason;
-    public $cancelReasonText;
-    public $orderTypeId;
-    public $selectedDeliveryApp = null;
-    public $allowOrderTypeSelection = false; // Flag to allow popup when user clicks "Change"
-    public $deliveryDateTime;
+    #[Locked]
     public $customerDisplayStatus = 'idle';
+    #[Locked]
     public $totalTaxAmount = 0;
+    #[Locked]
     public $orderItemTaxDetails = [];
+    #[Locked]
     public $taxMode;
+    #[Locked]
     public $pickupRange;
+    #[Locked]
     public $now;
+    #[Locked]
     public $minDate;
+    #[Locked]
     public $maxDate;
+    #[Locked]
     public $defaultDate;
-    public $formattedOrderNumber;
-    public $customerId;
+    #[Locked]
     public $customer;
+    #[Locked]
     public $menuList;
-    public $menuId;
+    #[Locked]
     public $menuItemsPerPage = 75;
+    #[Locked]
     public $menuItemsLoaded = 75;
 
-    // MultiPOS properties
+    // MultiPOS properties (locked - server controlled)
+    #[Locked]
     public $hasPosMachine = false;
+    #[Locked]
     public $machineStatus = null;
+    #[Locked]
     public $posMachine = null;
+    #[Locked]
     public $limitReached = false;
+    #[Locked]
     public $limitMessage = '';
+    #[Locked]
     public $shouldBlockPos = false;
+    #[Locked]
     public $restaurant;
+
+    // Computed properties for heavy data (not synced with requests)
+    #[Computed(persist: true)]
+    public function users()
+    {
+        return User::withoutGlobalScope(BranchScope::class)
+            ->where(function ($q) {
+                return $q->where('branch_id', branch()->id)
+                    ->orWhereNull('branch_id');
+            })
+            ->role('waiter_' . restaurant()->id)
+            ->where('restaurant_id', restaurant()->id)
+            ->get();
+    }
+
+    #[Computed(persist: true)]
+    public function taxes()
+    {
+        return cache()->remember('taxes_' . restaurant()->id, 60 * 60 * 24, function () {
+            return Tax::all();
+        });
+    }
+
+    #[Computed(persist: true)]
+    public function deliveryExecutives()
+    {
+        return DeliveryExecutive::where('status', 'available')->get();
+    }
 
     public function setCustomer($customerId = null)
     {
@@ -157,24 +223,13 @@ class Pos extends Component
         $this->maxDate = now()->addDays($this->pickupRange - 1)->endOfDay()->format('Y-m-d\TH:i');
         $this->defaultDate = old('deliveryDateTime', $this->deliveryDateTime ?? $this->minDate);
 
-        $this->users = User::withoutGlobalScope(BranchScope::class)
-            ->where(function ($q) {
-                return $q->where('branch_id', branch()->id)
-                    ->orWhereNull('branch_id');
-            })
-            ->role('waiter_' . $this->restaurant->id)
-            ->where('restaurant_id', $this->restaurant->id)
-            ->get();
+        // Users now comes from computed property $this->users
+        // Taxes now comes from computed property $this->taxes
+        // DeliveryExecutives now comes from computed property $this->deliveryExecutives
 
         $this->taxMode = $this->restaurant->tax_mode;
 
-        $this->taxes = cache()->remember('taxes_' . $this->restaurant->id, 60 * 60 * 24, function () {
-            return Tax::all();
-        });
-
         $this->selectWaiter = user()->id;
-
-        $this->deliveryExecutives = DeliveryExecutive::where('status', 'available')->get();
 
         if ($this->tableOrderID) {
             $this->tableId = $this->tableOrderID;

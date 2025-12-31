@@ -18,7 +18,8 @@
         @endif
 
         <div class="flex-grow lg:flex h-auto">
-            @include('pos.menu')
+            {{-- Use Alpine.js based menu for better performance --}}
+            @include('pos.menu-alpine')
             @if (!$orderDetail)
                 @include('pos.kot_items')
             @elseif($orderDetail->status == 'kot')

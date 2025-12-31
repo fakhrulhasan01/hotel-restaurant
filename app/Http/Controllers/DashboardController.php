@@ -93,4 +93,9 @@ class DashboardController extends Controller
     {
         return view('dashboard.padding-approval');
     }
+
+    public function dashboard2()
+    {
+        return view('dashboard.dashboard2');
+    }
 }

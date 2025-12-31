@@ -72,7 +72,7 @@
                     <div class="inline-flex items-center gap-2">
                         <x-select class="text-sm w-36 xl:w-fit" wire:model.live='selectWaiter'>
                             <option value="">@lang('modules.order.selectWaiter')</option>
-                            @foreach ($users as $item)
+                            @foreach ($this->users as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
                         </x-select>
@@ -84,7 +84,7 @@
                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3m0 14.2a7.2 7.2 0 0 1-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 0 1-6 3.22" />
                         </svg>
                         <span>@lang('modules.order.waiter'):</span>
-                        <span class="font-medium">{{ optional($users->firstWhere('id', $selectWaiter))->name }}</span>
+                        <span class="font-medium">{{ optional($this->users->firstWhere('id', $selectWaiter))->name }}</span>
                     </div>
                 @endif
             @endif
@@ -104,7 +104,7 @@
                         <x-select class="w-full text-sm" wire:model.live='selectDeliveryExecutive'
                             wire:change='saveDeliveryExecutive'>
                             <option value="">@lang('modules.order.selectDeliveryExecutive')</option>
-                            @foreach ($deliveryExecutives as $item)
+                            @foreach ($this->deliveryExecutives as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
                         </x-select>
@@ -457,7 +457,7 @@
             @endif
 
             @if ($taxMode == 'order')
-                @foreach ($taxes as $item)
+                @foreach ($this->taxes as $item)
                     <div class="flex justify-between text-sm text-gray-500 dark:text-neutral-400">
                         <div>
                             {{ $item->tax_name }} ({{ $item->tax_percent }}%)

@@ -34,20 +34,21 @@ use App\Enums\OrderStatus;
 class PosApiController extends Controller
 {
 
-    private $branch;
-    private $restaurant;
-
-    public function __construct()
+    private function branch()
     {
-        $this->branch = Branch::find(1);
-        $this->restaurant = Restaurant::find(1);
+        return branch();
+    }
+
+    private function restaurant()
+    {
+        return restaurant();
     }
 
     public function getMenus()
     {
-
-        $menus = cache()->remember('menus_' . $this->branch->id, 60, function () {
-            return Menu::where('branch_id', $this->branch->id)->get()->map(function ($menu) {
+        $branch = $this->branch();
+        $menus = cache()->remember('menus_' . $branch->id, 60, function () use ($branch) {
+            return Menu::where('branch_id', $branch->id)->get()->map(function ($menu) {
                 return [
                     'id' => $menu->id,
                     'menu_name' => $menu->getTranslation('menu_name', session('locale', app()->getLocale())),
@@ -62,8 +63,9 @@ class PosApiController extends Controller
 
     public function getCategories()
     {
-        $categories = cache()->remember('categories_' . $this->branch->id, 60, function () {
-            return ItemCategory::where('branch_id', $this->branch->id)->get()->map(function ($category) {
+        $branch = $this->branch();
+        $categories = cache()->remember('categories_' . $branch->id, 60, function () use ($branch) {
+            return ItemCategory::where('branch_id', $branch->id)->get()->map(function ($category) {
                 return [
                     'id' => $category->id,
                     'count' => $category->items()->count(),
@@ -77,28 +79,48 @@ class PosApiController extends Controller
 
     public function getMenuItems()
     {
-        $menuItems = cache()->remember('menu_items_' . $this->branch->id, 60, function () {
-            return MenuItem::where('branch_id', $this->branch->id)
+        $branch = $this->branch();
+        $menuItems = cache()->remember('menu_items_pos_' . $branch->id, 120, function () use ($branch) {
+            // Note: MenuItem model has AvailableMenuItemScope which auto-filters by is_available = true
+            return MenuItem::where('branch_id', $branch->id)
                 ->with('prices:id,menu_item_id,order_type_id,final_price', 'prices.orderType:id,order_type_name')
                 ->withCount('variations', 'modifierGroups')
-                ->get();
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'item_name' => $item->item_name, // Uses accessor which handles translations
+                        'menu_id' => $item->menu_id,
+                        'item_category_id' => $item->item_category_id,
+                        'price' => $item->price,
+                        'image' => $item->item_photo_url,
+                        'type' => $item->type,
+                        'in_stock' => (bool) $item->in_stock,
+                        'variations_count' => $item->variations_count,
+                        'modifier_groups_count' => $item->modifier_groups_count,
+                        'sort_order' => $item->sort_order ?? 0,
+                    ];
+                });
         });
         return response()->json($menuItems);
     }
 
     public function getWaiters()
     {
-        $waiters = cache()->remember('waiters_' . $this->branch->id, 60, function () {
-            return User::where('restaurant_id', $this->restaurant->id)->get();
+        $branch = $this->branch();
+        $restaurant = $this->restaurant();
+        $waiters = cache()->remember('waiters_' . $branch->id, 60, function () use ($restaurant) {
+            return User::where('restaurant_id', $restaurant->id)->get();
         });
         return response()->json($waiters);
     }
 
     public function getCustomers(Request $request)
     {
+        $restaurant = $this->restaurant();
         $searchQuery = $request->query('search', '');
 
-        $query = Customer::where('restaurant_id', $this->restaurant->id);
+        $query = Customer::where('restaurant_id', $restaurant->id);
 
         if (!empty($searchQuery) && strlen($searchQuery) >= 2) {
             $query->where(function ($q) use ($searchQuery) {
@@ -145,13 +167,13 @@ class PosApiController extends Controller
         $existingCustomer = null;
 
         if (!empty($validated['email'])) {
-            $existingCustomer = Customer::where('restaurant_id', $this->restaurant->id)
+            $existingCustomer = Customer::where('restaurant_id', $this->restaurant()->id)
                 ->where('email', $validated['email'])
                 ->first();
         }
 
         if (!$existingCustomer && !empty($validated['phone'])) {
-            $existingCustomer = Customer::where('restaurant_id', $this->restaurant->id)
+            $existingCustomer = Customer::where('restaurant_id', $this->restaurant()->id)
                 ->where('phone', $validated['phone'])
                 ->first();
         }
@@ -168,12 +190,12 @@ class PosApiController extends Controller
         if ($existingCustomer) {
             $customer = tap($existingCustomer)->update($customerData);
         } else {
-            $customerData['restaurant_id'] = $this->restaurant->id;
+            $customerData['restaurant_id'] = $this->restaurant()->id;
             $customer = Customer::create($customerData);
         }
 
         // Clear cache
-        cache()->forget('customers_' . $this->branch->id);
+        cache()->forget('customers_' . $this->branch()->id);
 
         return response()->json([
             'success' => true,
@@ -186,7 +208,7 @@ class PosApiController extends Controller
     {
         $extraCharges = RestaurantCharge::whereJsonContains('order_types', $orderType)
             ->where('is_enabled', true)
-            ->where('restaurant_id', $this->restaurant->id)
+            ->where('restaurant_id', $this->restaurant()->id)
             ->get();
 
         return response()->json($extraCharges);
@@ -201,7 +223,7 @@ class PosApiController extends Controller
         $userId = $user ? $user->id : null;
         $isAdmin = $user ? $user->hasRole('Admin_' . $user->restaurant_id) : false;
 
-        $tables = Table::where('branch_id', $this->branch->id)
+        $tables = Table::where('branch_id', $this->branch()->id)
             ->where('available_status', '<>', 'running')
             ->where('status', 'active')
             ->with(['area', 'tableSession.lockedByUser'])
@@ -241,7 +263,7 @@ class PosApiController extends Controller
 
     public function getTodayReservations()
     {
-        $reservations = Reservation::where('branch_id', $this->branch->id)
+        $reservations = Reservation::where('branch_id', $this->branch()->id)
             ->whereDate('reservation_date_time', today())
             ->whereNotNull('table_id')
             ->with('table')
@@ -306,7 +328,7 @@ class PosApiController extends Controller
 
     public function getOrderTypes()
     {
-        $orderTypes = OrderType::where('branch_id', $this->branch->id)
+        $orderTypes = OrderType::where('branch_id', $this->branch()->id)
             ->where('is_active', true)
             ->orderBy('order_type_name')
             ->get()
@@ -341,9 +363,9 @@ class PosApiController extends Controller
 
     public function getOrderNumber()
     {
-        $orderNumberData = Order::generateOrderNumber($this->branch);
+        $orderNumberData = Order::generateOrderNumber($this->branch());
 
-        $formattedOrderNumber = isOrderPrefixEnabled($this->branch)
+        $formattedOrderNumber = isOrderPrefixEnabled($this->branch())
             ? $orderNumberData['formatted_order_number']
             : __('modules.order.orderNumber') . ' #' . $orderNumberData['order_number'];
 
@@ -420,7 +442,7 @@ class PosApiController extends Controller
             if (!empty($customerData['name']) || !empty($customerData['phone']) || !empty($customerData['email'])) {
                 $customer = Customer::firstOrCreate(
                     [
-                        'restaurant_id' => $this->restaurant->id,
+                        'restaurant_id' => $this->restaurant()->id,
                         'phone' => $customerData['phone'] ?? null,
                     ],
                     [
@@ -449,7 +471,7 @@ class PosApiController extends Controller
             $orderTypeSlug = null;
             $orderTypeName = null;
 
-            $orderTypeModel = OrderType::where('branch_id', $this->branch->id)
+            $orderTypeModel = OrderType::where('branch_id', $this->branch()->id)
                 ->where('is_active', true)
                 ->where(function ($q) use ($normalizedOrderType, $orderTypeDisplay) {
                     $q->where('slug', $normalizedOrderType)
@@ -464,7 +486,7 @@ class PosApiController extends Controller
                 $orderTypeName = $orderTypeModel->order_type_name;
             } else {
                 // Fallback to default order type
-                $orderTypeModel = OrderType::where('branch_id', $this->branch->id)
+                $orderTypeModel = OrderType::where('branch_id', $this->branch()->id)
                     ->where('is_default', true)
                     ->where('is_active', true)
                     ->first();
@@ -530,7 +552,7 @@ class PosApiController extends Controller
             $total = max(0, $total);
 
             // Generate order number (similar to Pos.php)
-            $orderNumberData = Order::generateOrderNumber($this->branch);
+            $orderNumberData = Order::generateOrderNumber($this->branch());
 
             // Determine status based on actions (similar to Pos.php saveOrder)
             $status = 'draft';
@@ -569,7 +591,7 @@ class PosApiController extends Controller
             $order = Order::create([
                 'order_number' => $orderNumberData['order_number'],
                 'formatted_order_number' => $orderNumberData['formatted_order_number'],
-                'branch_id' => $this->branch->id,
+                'branch_id' => $this->branch()->id,
                 'table_id' => $tableId,
                 'date_time' => now(),
                 'number_of_pax' => $pax,
@@ -632,11 +654,11 @@ class PosApiController extends Controller
             if ($status == 'kot') {
                 // For now, create single KOT (can be extended for kitchen places later)
                 $kot = Kot::create([
-                    'branch_id' => $this->branch->id,
-                    'kot_number' => Kot::generateKotNumber($this->branch),
+                    'branch_id' => $this->branch()->id,
+                    'kot_number' => Kot::generateKotNumber($this->branch()),
                     'order_id' => $order->id,
                     'order_type_id' => $orderTypeId,
-                    'token_number' => Kot::generateTokenNumber($this->branch->id, $orderTypeId),
+                    'token_number' => Kot::generateTokenNumber($this->branch()->id, $orderTypeId),
                     'note' => $note,
                 ]);
 
@@ -689,7 +711,7 @@ class PosApiController extends Controller
                     }
 
                     $orderItem = OrderItem::create([
-                        'branch_id' => $this->branch->id,
+                        'branch_id' => $this->branch()->id,
                         'order_id' => $order->id,
                         'menu_item_id' => $menuItemId,
                         'menu_item_variation_id' => $variantId > 0 ? $variantId : null,
@@ -823,7 +845,7 @@ class PosApiController extends Controller
 
     public function getOrders($status = null)
     {
-        $orders = Order::where('branch_id', $this->branch->id)
+        $orders = Order::where('branch_id', $this->branch()->id)
             ->with('items', 'customer', 'table', 'waiter', 'kot', 'kot.items', 'kot.items.menuItem');
 
         if ($status) {
@@ -840,9 +862,482 @@ class PosApiController extends Controller
         return response()->json($taxes);
     }
 
+    public function getItemVariations($itemId)
+    {
+        $item = MenuItem::with(['variations.prices' => function($q) {
+            $q->where('status', true);
+        }])->find($itemId);
+
+        if (!$item) {
+            return response()->json([], 404);
+        }
+
+        $variations = $item->variations->map(function($variation) use ($item) {
+            return [
+                'id' => $variation->id,
+                'variation_name' => $variation->variation_name,
+                'price' => $variation->price ?? $item->price,
+            ];
+        });
+
+        return response()->json($variations);
+    }
+
     public function getRestaurants()
     {
-        $restaurant = Restaurant::with('currency')->where('id', $this->restaurant->id)->first();
+        $restaurant = Restaurant::with('currency')->where('id', $this->restaurant()->id)->first();
         return response()->json($restaurant);
+    }
+
+    /**
+     * Get delivery executives
+     */
+    public function getDeliveryExecutives()
+    {
+        $branch = $this->branch();
+        $restaurant = $this->restaurant();
+
+        $deliveryExecutives = \App\Models\DeliveryExecutive::where('restaurant_id', $restaurant->id)
+            ->where('status', 'active')
+            ->get()
+            ->map(function ($exec) {
+                return [
+                    'id' => $exec->id,
+                    'name' => $exec->name,
+                    'phone' => $exec->phone,
+                    'email' => $exec->email,
+                ];
+            });
+
+        return response()->json($deliveryExecutives);
+    }
+
+    /**
+     * Get modifiers for a menu item
+     */
+    public function getItemModifiers($itemId)
+    {
+        $item = MenuItem::with(['modifierGroups.modifierOptions'])->find($itemId);
+
+        if (!$item) {
+            return response()->json([], 404);
+        }
+
+        $modifiers = $item->modifierGroups->map(function ($group) {
+            return [
+                'id' => $group->id,
+                'group_name' => $group->group_name,
+                'min_selection' => $group->min_selection ?? 0,
+                'max_selection' => $group->max_selection ?? 1,
+                'required' => $group->required ?? false,
+                'options' => $group->modifierOptions->map(function ($option) {
+                    return [
+                        'id' => $option->id,
+                        'option_name' => $option->option_name,
+                        'price' => $option->price ?? 0,
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json($modifiers);
+    }
+
+    /**
+     * Get item prices for order type
+     */
+    public function getItemPrices(Request $request, $itemId)
+    {
+        $orderTypeId = $request->query('order_type_id');
+        $deliveryAppId = $request->query('delivery_app_id');
+
+        $item = MenuItem::with(['prices' => function ($q) use ($orderTypeId) {
+            if ($orderTypeId) {
+                $q->where('order_type_id', $orderTypeId);
+            }
+        }])->find($itemId);
+
+        if (!$item) {
+            return response()->json(['price' => 0], 404);
+        }
+
+        // Set price context if available
+        if (method_exists($item, 'setPriceContext') && $orderTypeId) {
+            $item->setPriceContext($orderTypeId, $deliveryAppId);
+        }
+
+        return response()->json([
+            'price' => $item->price,
+            'original_price' => $item->original_price ?? $item->price,
+        ]);
+    }
+
+    /**
+     * Process payment for an order
+     */
+    public function processPayment(Request $request, $orderId)
+    {
+        try {
+            DB::beginTransaction();
+
+            $order = Order::find($orderId);
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found',
+                ], 404);
+            }
+
+            $paymentMethod = $request->input('payment_method', 'cash');
+            $amountPaid = $request->input('amount_paid', $order->total);
+            $tipAmount = $request->input('tip_amount', 0);
+            $change = $request->input('change', 0);
+
+            // Create payment record
+            $payment = \App\Models\Payment::create([
+                'order_id' => $order->id,
+                'branch_id' => $order->branch_id,
+                'payment_method' => $paymentMethod,
+                'amount' => $amountPaid,
+                'tip_amount' => $tipAmount,
+                'change_amount' => $change,
+                'status' => 'completed',
+                'payment_date' => now(),
+            ]);
+
+            // Update order status
+            $order->update([
+                'status' => 'paid',
+                'order_status' => 'delivered',
+                'tip_amount' => $tipAmount,
+            ]);
+
+            // Update table status if dine-in
+            if ($order->table_id) {
+                Table::where('id', $order->table_id)->update([
+                    'available_status' => 'available'
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.paymentSuccess'),
+                'payment' => $payment,
+                'order' => $order->fresh(),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Payment processing error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an existing order
+     */
+    public function updateOrder(Request $request, $orderId)
+    {
+        try {
+            DB::beginTransaction();
+
+            $order = Order::find($orderId);
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found',
+                ], 404);
+            }
+
+            $data = $request->all();
+
+            // Update order fields
+            $updateData = [];
+
+            if (isset($data['discount_type'])) {
+                $updateData['discount_type'] = $data['discount_type'];
+            }
+            if (isset($data['discount_value'])) {
+                $updateData['discount_value'] = $data['discount_value'];
+            }
+            if (isset($data['discount_amount'])) {
+                $updateData['discount_amount'] = $data['discount_amount'];
+            }
+            if (isset($data['tip_amount'])) {
+                $updateData['tip_amount'] = $data['tip_amount'];
+            }
+            if (isset($data['delivery_fee'])) {
+                $updateData['delivery_fee'] = $data['delivery_fee'];
+            }
+            if (isset($data['delivery_executive_id'])) {
+                $updateData['delivery_executive_id'] = $data['delivery_executive_id'];
+            }
+            if (isset($data['customer_id'])) {
+                $updateData['customer_id'] = $data['customer_id'];
+            }
+            if (isset($data['waiter_id'])) {
+                $updateData['waiter_id'] = $data['waiter_id'];
+            }
+            if (isset($data['number_of_pax'])) {
+                $updateData['number_of_pax'] = $data['number_of_pax'];
+            }
+            if (isset($data['table_id'])) {
+                $updateData['table_id'] = $data['table_id'];
+            }
+            if (isset($data['note'])) {
+                $updateData['note'] = $data['note'];
+            }
+
+            // Recalculate totals if items changed
+            if (isset($data['items'])) {
+                // Delete existing items and recreate
+                $order->items()->delete();
+
+                $subTotal = 0;
+                foreach ($data['items'] as $item) {
+                    $menuItemId = $item['menu_item_id'] ?? $item['id'] ?? null;
+                    $variantId = $item['variation_id'] ?? $item['variant_id'] ?? null;
+                    $quantity = $item['qty'] ?? $item['quantity'] ?? 1;
+                    $price = $item['price'] ?? 0;
+                    $itemNote = $item['note'] ?? null;
+                    $modifierIds = $item['modifier_ids'] ?? [];
+                    $amount = $price * $quantity;
+
+                    $orderItem = OrderItem::create([
+                        'branch_id' => $order->branch_id,
+                        'order_id' => $order->id,
+                        'menu_item_id' => $menuItemId,
+                        'menu_item_variation_id' => $variantId > 0 ? $variantId : null,
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'amount' => $amount,
+                        'note' => $itemNote,
+                        'order_type' => $order->order_type,
+                        'order_type_id' => $order->order_type_id,
+                    ]);
+
+                    if (!empty($modifierIds) && is_array($modifierIds)) {
+                        $orderItem->modifierOptions()->sync($modifierIds);
+                    }
+
+                    $subTotal += $amount;
+                }
+
+                $updateData['sub_total'] = $subTotal;
+
+                // Apply discount
+                $discountAmount = 0;
+                $discountType = $data['discount_type'] ?? $order->discount_type;
+                $discountValue = $data['discount_value'] ?? $order->discount_value;
+
+                if ($discountType === 'percent') {
+                    $discountAmount = round(($subTotal * $discountValue) / 100, 2);
+                } elseif ($discountType === 'fixed') {
+                    $discountAmount = min($discountValue, $subTotal);
+                }
+
+                $updateData['discount_amount'] = $discountAmount;
+
+                // Calculate total
+                $total = $subTotal - $discountAmount;
+
+                // Add taxes
+                $orderTaxes = OrderTax::where('order_id', $order->id)->with('tax')->get();
+                $totalTaxAmount = 0;
+                foreach ($orderTaxes as $orderTax) {
+                    if ($orderTax->tax) {
+                        $taxAmount = ($subTotal * $orderTax->tax->tax_percent) / 100;
+                        $total += $taxAmount;
+                        $totalTaxAmount += $taxAmount;
+                    }
+                }
+
+                // Add delivery fee
+                $deliveryFee = $data['delivery_fee'] ?? $order->delivery_fee ?? 0;
+                $total += $deliveryFee;
+
+                // Add tip
+                $tipAmount = $data['tip_amount'] ?? $order->tip_amount ?? 0;
+                $total += $tipAmount;
+
+                $updateData['total'] = max(0, $total);
+                $updateData['total_tax_amount'] = $totalTaxAmount;
+            }
+
+            $order->update($updateData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.orderUpdated'),
+                'order' => $order->fresh(['items', 'customer', 'table', 'waiter']),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Order update error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update order: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Cancel an order
+     */
+    public function cancelOrder(Request $request, $orderId)
+    {
+        try {
+            DB::beginTransaction();
+
+            $order = Order::find($orderId);
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found',
+                ], 404);
+            }
+
+            $reason = $request->input('reason', '');
+
+            // Update order status
+            $order->update([
+                'status' => 'cancelled',
+                'order_status' => 'cancelled',
+                'cancel_reason' => $reason,
+            ]);
+
+            // Update table status if dine-in
+            if ($order->table_id) {
+                Table::where('id', $order->table_id)->update([
+                    'available_status' => 'available'
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.orderCanceled'),
+                'order' => $order->fresh(),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Order cancellation error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel order: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get areas for tables
+     */
+    public function getAreas()
+    {
+        $areas = Area::where('branch_id', $this->branch()->id)
+            ->where('status', 'active')
+            ->withCount('tables')
+            ->get()
+            ->map(function ($area) {
+                return [
+                    'id' => $area->id,
+                    'area_name' => $area->area_name,
+                    'tables_count' => $area->tables_count,
+                ];
+            });
+
+        return response()->json($areas);
+    }
+
+    /**
+     * Get running orders (for display/dashboard)
+     */
+    public function getRunningOrders()
+    {
+        $orders = Order::where('branch_id', $this->branch()->id)
+            ->whereIn('status', ['kot', 'billed'])
+            ->whereIn('order_status', ['placed', 'confirmed', 'preparing', 'food_ready'])
+            ->with(['items.menuItem', 'customer', 'table', 'waiter'])
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        return response()->json($orders);
+    }
+
+    /**
+     * Get payment methods
+     */
+    public function getPaymentMethods()
+    {
+        $methods = [
+            ['id' => 'cash', 'name' => __('modules.payment.cash')],
+            ['id' => 'card', 'name' => __('modules.payment.card')],
+            ['id' => 'upi', 'name' => __('modules.payment.upi')],
+            ['id' => 'other', 'name' => __('modules.payment.other')],
+        ];
+
+        return response()->json($methods);
+    }
+
+    /**
+     * Print order
+     */
+    public function printOrder($orderId)
+    {
+        $order = Order::with(['items.menuItem', 'items.menuItemVariation', 'customer', 'table', 'waiter', 'taxes.tax'])->find($orderId);
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found',
+            ], 404);
+        }
+
+        // Return print URL
+        return response()->json([
+            'success' => true,
+            'print_url' => route('orders.print', $order->id),
+            'order' => $order,
+        ]);
+    }
+
+    /**
+     * Print KOT
+     */
+    public function printKot($kotId)
+    {
+        $kot = Kot::with(['items.menuItem', 'items.menuItemVariation', 'order'])->find($kotId);
+
+        if (!$kot) {
+            return response()->json([
+                'success' => false,
+                'message' => 'KOT not found',
+            ], 404);
+        }
+
+        // Return print URL
+        return response()->json([
+            'success' => true,
+            'print_url' => route('kot.print', $kot->id),
+            'kot' => $kot,
+        ]);
     }
 }

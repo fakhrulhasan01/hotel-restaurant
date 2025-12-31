@@ -129,7 +129,9 @@ Route::get('/paystack/callback', [PaystackController::class, 'handleGatewayCallb
 
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', VerifyRestaurantAccess::class, CheckRestaurantPackage::class])->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'dashboard2'])->name('dashboard');
+    Route::get('dashboard2', [DashboardController::class, 'dashboard2'])->name('dashboard2');
     Route::get('account_unverified', [DashboardController::class, 'accountUnverified'])->name('account_unverified');
 
     Route::get('onboarding-steps', [OnboardingStepController::class, 'index'])->name('onboarding_steps');
@@ -305,26 +307,38 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified'])->group
     Route::get('posvue/order/{id}', [PosController::class, 'ordervue'])->name('pos.order.vue');
     Route::get('posvue/kot/{id}', [PosController::class, 'kotvue'])->name('pos.kot.vue');
 
-    Route::prefix('api/pos')->group(function () {
-        Route::get('/menus', [PosApiController::class, 'getMenus']);
-        Route::get('/orders/{id}', [PosApiController::class, 'getOrder']);
-        Route::get('/get-order-number', [PosApiController::class, 'getOrderNumber']);
-        Route::get('/waiters', [PosApiController::class, 'getWaiters']);
-        Route::get('/categories', [PosApiController::class, 'getCategories']);
-        Route::get('/items', [PosApiController::class, 'getMenuItems']);
-        Route::get('/items/category/{categoryId}', [PosApiController::class, 'getMenuItemsByCategory']);
-        Route::get('/items/menu/{menuId}', [PosApiController::class, 'getMenuItemsByMenu']);
-        Route::get('/extra-charges/{orderType}', [PosApiController::class, 'getExtraCharges']);
-        Route::get('/tables', [PosApiController::class, 'getTables']);
-        Route::get('/reservations/today', [PosApiController::class, 'getTodayReservations']);
-        Route::post('/tables/{tableId}/unlock', [PosApiController::class, 'forceUnlockTable']);
-        Route::get('/order-types', [PosApiController::class, 'getOrderTypes']);
-        Route::get('/delivery-platforms', [PosApiController::class, 'getDeliveryPlatforms']);
-        Route::post('/orders', [PosApiController::class, 'submitOrder']);
-        Route::get('/customers', [PosApiController::class, 'getCustomers']);
-        Route::get('/phone-codes', [PosApiController::class, 'getPhoneCodes']);
-        Route::post('/customers', [PosApiController::class, 'saveCustomer']);
-        Route::get('/taxes', [PosApiController::class, 'getTaxes']);
-        Route::get('/restaurants', [PosApiController::class, 'getRestaurants']);
+    Route::prefix('api/pos')->name('pos-api.')->group(function () {
+        Route::get('/menus', [PosApiController::class, 'getMenus'])->name('menus');
+        Route::get('/orders/{id}', [PosApiController::class, 'getOrder'])->name('order');
+        Route::get('/get-order-number', [PosApiController::class, 'getOrderNumber'])->name('order-number');
+        Route::get('/waiters', [PosApiController::class, 'getWaiters'])->name('waiters');
+        Route::get('/categories', [PosApiController::class, 'getCategories'])->name('categories');
+        Route::get('/items', [PosApiController::class, 'getMenuItems'])->name('items');
+        Route::get('/items/{itemId}/variations', [PosApiController::class, 'getItemVariations'])->name('items.variations');
+        Route::get('/items/{itemId}/modifiers', [PosApiController::class, 'getItemModifiers'])->name('items.modifiers');
+        Route::get('/items/{itemId}/price', [PosApiController::class, 'getItemPrices'])->name('items.price');
+        Route::get('/items/category/{categoryId}', [PosApiController::class, 'getMenuItemsByCategory'])->name('items.category');
+        Route::get('/items/menu/{menuId}', [PosApiController::class, 'getMenuItemsByMenu'])->name('items.menu');
+        Route::get('/extra-charges/{orderType}', [PosApiController::class, 'getExtraCharges'])->name('extra-charges');
+        Route::get('/tables', [PosApiController::class, 'getTables'])->name('tables');
+        Route::get('/areas', [PosApiController::class, 'getAreas'])->name('areas');
+        Route::get('/reservations/today', [PosApiController::class, 'getTodayReservations'])->name('reservations-today');
+        Route::post('/tables/{tableId}/unlock', [PosApiController::class, 'forceUnlockTable'])->name('tables.unlock');
+        Route::get('/order-types', [PosApiController::class, 'getOrderTypes'])->name('order-types');
+        Route::get('/delivery-platforms', [PosApiController::class, 'getDeliveryPlatforms'])->name('delivery-platforms');
+        Route::get('/delivery-executives', [PosApiController::class, 'getDeliveryExecutives'])->name('delivery-executives');
+        Route::post('/orders', [PosApiController::class, 'submitOrder'])->name('orders');
+        Route::put('/orders/{orderId}', [PosApiController::class, 'updateOrder'])->name('orders.update');
+        Route::post('/orders/{orderId}/cancel', [PosApiController::class, 'cancelOrder'])->name('orders.cancel');
+        Route::post('/orders/{orderId}/payment', [PosApiController::class, 'processPayment'])->name('orders.payment');
+        Route::get('/orders/{orderId}/print', [PosApiController::class, 'printOrder'])->name('orders.print');
+        Route::get('/kot/{kotId}/print', [PosApiController::class, 'printKot'])->name('kot.print');
+        Route::get('/customers', [PosApiController::class, 'getCustomers'])->name('customers');
+        Route::get('/phone-codes', [PosApiController::class, 'getPhoneCodes'])->name('phone-codes');
+        Route::post('/customers', [PosApiController::class, 'saveCustomer'])->name('customers.save');
+        Route::get('/taxes', [PosApiController::class, 'getTaxes'])->name('taxes');
+        Route::get('/restaurants', [PosApiController::class, 'getRestaurants'])->name('restaurants');
+        Route::get('/running-orders', [PosApiController::class, 'getRunningOrders'])->name('running-orders');
+        Route::get('/payment-methods', [PosApiController::class, 'getPaymentMethods'])->name('payment-methods');
     });
 });

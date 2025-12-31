@@ -129,13 +129,13 @@
                         @if (auth()->user()->roles->pluck('display_name')->contains('Waiter'))
                             <span
                                 class="text-sm w-36 px-2 py-1 border border-gray-300 rounded-md bg-gray-100 dark:text-gray-200 dark:bg-gray-600 dark:border-gray-700 truncate"
-                                title="{{ $users->where('id', $selectWaiter)->first()->name ?? __('modules.order.selectWaiter') }}">
-                                {{ $users->where('id', $selectWaiter)->first()->name ?? __('modules.order.selectWaiter') }}
+                                title="{{ $this->users->where('id', $selectWaiter)->first()->name ?? __('modules.order.selectWaiter') }}">
+                                {{ $this->users->where('id', $selectWaiter)->first()->name ?? __('modules.order.selectWaiter') }}
                             </span>
                         @else
                             <x-select class="text-sm w-36" wire:model.defer='selectWaiter'>
                                 <option value="">@lang('modules.order.selectWaiter')</option>
-                                @foreach ($users as $item)
+                                @foreach ($this->users as $item)
                                     <option value="{{ $item->id }}">{{ $item->name }}</option>
                                 @endforeach
                             </x-select>
@@ -159,7 +159,7 @@
 
                         <x-select class="text-sm w-full" wire:model.defer='selectDeliveryExecutive'>
                             <option value="">@lang('modules.order.selectDeliveryExecutive')</option>
-                            @foreach ($deliveryExecutives as $item)
+                            @foreach ($this->deliveryExecutives as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
                         </x-select>
@@ -461,7 +461,7 @@
             @endif
 
             @if ($taxMode == 'order')
-                @foreach ($taxes as $item)
+                @foreach ($this->taxes as $item)
                     <div class="flex justify-between text-gray-500 text-sm dark:text-neutral-400">
                         <div>
                             {{ $item->tax_name }} ({{ $item->tax_percent }}%)
