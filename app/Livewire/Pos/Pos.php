@@ -1567,6 +1567,159 @@ class Pos extends Component
         $this->calculateTotal();
     }
 
+    /**
+     * Submit cart items in bulk from offline cart
+     * This method is optimized for offline-first POS where cart is managed client-side
+     *
+     * @param array $cartData Array of cart items with menu_item_id, variation_id, qty, modifiers, note
+     * @param array $actions Array of actions like ['kot'], ['bill'], ['bill', 'payment'], etc.
+     */
+    public function submitBulkCart(array $cartData, array $actions)
+    {
+        if (empty($cartData)) {
+            return;
+        }
+
+        // Permission check
+        if (($this->orderID && !user_can('Update Order')) || (!$this->orderID && !user_can('Create Order'))) {
+            return;
+        }
+
+        // Check order limit
+        $orderStats = getRestaurantOrderStats(branch()->id);
+        if (!$orderStats['unlimited'] && $orderStats['current_count'] >= $orderStats['order_limit']) {
+            $this->alert('error', __('messages.orderLimitReached'), [
+                'toast' => true,
+                'position' => 'top-end',
+            ]);
+            return;
+        }
+
+        // Get normalized delivery app ID for price context
+        $normalizedDeliveryAppId = $this->normalizeDeliveryAppId();
+
+        // Reset cart arrays
+        $this->resetCartArrays();
+
+        // Bulk load all menu items and variations needed
+        $menuItemIds = collect($cartData)->pluck('menu_item_id')->unique()->toArray();
+        $variationIds = collect($cartData)->pluck('variation_id')->filter()->unique()->toArray();
+
+        $menuItems = MenuItem::with([
+            'prices' => function ($q) use ($normalizedDeliveryAppId) {
+                $q->where('status', true)->whereNull('menu_item_variation_id');
+                if ($this->orderTypeId) {
+                    $q->where('order_type_id', $this->orderTypeId);
+                }
+                if ($normalizedDeliveryAppId) {
+                    $q->where(function($query) use ($normalizedDeliveryAppId) {
+                        $query->where('delivery_app_id', $normalizedDeliveryAppId)->orWhereNull('delivery_app_id');
+                    });
+                } else {
+                    $q->whereNull('delivery_app_id');
+                }
+            },
+            'taxes',
+            'variations.prices',
+            'modifierGroups.modifiers'
+        ])->whereIn('id', $menuItemIds)->get()->keyBy('id');
+
+        $variations = [];
+        if (!empty($variationIds)) {
+            $variations = \App\Models\MenuItemVariation::with([
+                'prices' => function ($q) use ($normalizedDeliveryAppId) {
+                    $q->where('status', true);
+                    if ($this->orderTypeId) {
+                        $q->where('order_type_id', $this->orderTypeId);
+                    }
+                    if ($normalizedDeliveryAppId) {
+                        $q->where(function($query) use ($normalizedDeliveryAppId) {
+                            $query->where('delivery_app_id', $normalizedDeliveryAppId)->orWhereNull('delivery_app_id');
+                        });
+                    } else {
+                        $q->whereNull('delivery_app_id');
+                    }
+                }
+            ])->whereIn('id', $variationIds)->get()->keyBy('id');
+        }
+
+        // Process each cart item
+        foreach ($cartData as $index => $item) {
+            $menuItemId = $item['menu_item_id'];
+            $variationId = $item['variation_id'] ?? null;
+            $qty = max(1, (int) ($item['qty'] ?? 1));
+            $modifiers = $item['modifiers'] ?? [];
+            $note = $item['note'] ?? '';
+
+            if (!isset($menuItems[$menuItemId])) {
+                continue; // Skip invalid items
+            }
+
+            $menuItem = $menuItems[$menuItemId];
+
+            // Set price context
+            if ($this->orderTypeId) {
+                $menuItem->setPriceContext($this->orderTypeId, $normalizedDeliveryAppId);
+            }
+
+            // Generate unique key for this cart item
+            $cartKey = $menuItemId;
+            if ($variationId) {
+                $cartKey .= '_' . $variationId;
+            }
+            if (!empty($modifiers)) {
+                $modifierIds = collect($modifiers)->pluck('id')->sort()->implode('_');
+                $cartKey .= '_mod_' . $modifierIds;
+            }
+
+            // Store in cart arrays
+            $this->orderItemList[$cartKey] = $menuItem;
+            $this->orderItemQty[$cartKey] = $qty;
+            $this->itemNotes[$cartKey] = $note;
+
+            // Handle variation
+            if ($variationId && isset($variations[$variationId])) {
+                $variation = $variations[$variationId];
+                if ($this->orderTypeId) {
+                    $variation->setPriceContext($this->orderTypeId, $normalizedDeliveryAppId);
+                }
+                $this->orderItemVariation[$cartKey] = $variation;
+            }
+
+            // Handle modifiers
+            $modifiersPrice = 0;
+            if (!empty($modifiers)) {
+                $modifierIds = [];
+                foreach ($modifiers as $mod) {
+                    $modifierIds[] = $mod['id'];
+                    $modifiersPrice += (float) ($mod['price'] ?? 0);
+                }
+                $this->itemModifiersSelected[$cartKey] = $modifierIds;
+                $this->orderItemModifiersPrice[$cartKey] = $modifiersPrice;
+            }
+
+            // Calculate amount
+            $basePrice = isset($this->orderItemVariation[$cartKey])
+                ? $this->orderItemVariation[$cartKey]->price
+                : $menuItem->price;
+            $this->orderItemAmount[$cartKey] = $qty * ($basePrice + $modifiersPrice);
+        }
+
+        // Calculate totals
+        $this->calculateTotal();
+
+        // Dispatch play beep sound
+        $this->dispatch('play_beep');
+
+        // Determine action and second/third actions from array
+        $action = $actions[0] ?? 'bill';
+        $secondAction = $actions[1] ?? null;
+        $thirdAction = $actions[2] ?? null;
+
+        // Call the regular saveOrder method
+        $this->saveOrder($action, $secondAction, $thirdAction);
+    }
+
     public function saveOrder($action, $secondAction = null, $thirdAction = null)
     {
         // Check if table is locked by another user before saving order

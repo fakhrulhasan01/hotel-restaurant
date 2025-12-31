@@ -1,4 +1,11 @@
 <div class="relative">
+    {{-- Include offline JS for POS - load early in head to ensure availability --}}
+    @once
+        @push('styles')
+            <script src="{{ asset('js/pos-offline.js') }}"></script>
+        @endpush
+    @endonce
+
     {{-- Include MultiPOS registration and status handling --}}
     @if(module_enabled('MultiPOS'))
         @include('multipos::partials.pos-registration', [
@@ -18,10 +25,10 @@
         @endif
 
         <div class="flex-grow lg:flex h-auto">
-            {{-- Use Alpine.js based menu for better performance --}}
-            @include('pos.menu-alpine')
+            {{-- Use offline-first menu for better performance --}}
+            @include('pos.menu-offline')
             @if (!$orderDetail)
-                @include('pos.kot_items')
+                @include('pos.kot_items_offline')
             @elseif($orderDetail->status == 'kot')
                 @include('pos.order_items')
             @elseif($orderDetail->status == 'billed' || $orderDetail->status == 'paid')

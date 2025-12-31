@@ -105,6 +105,98 @@ class PosApiController extends Controller
         return response()->json($menuItems);
     }
 
+    /**
+     * Get menu items with variations and modifiers included for offline use
+     */
+    public function getMenuItemsWithVariations(Request $request)
+    {
+        $branch = $this->branch();
+        $orderTypeId = $request->input('order_type_id');
+        $deliveryAppId = $request->input('delivery_app_id');
+
+        $cacheKey = 'menu_items_full_' . $branch->id . '_' . ($orderTypeId ?? 'all') . '_' . ($deliveryAppId ?? 'none');
+
+        $menuItems = cache()->remember($cacheKey, 300, function () use ($branch, $orderTypeId, $deliveryAppId) {
+            return MenuItem::where('branch_id', $branch->id)
+                ->with([
+                    'variations' => function ($q) use ($orderTypeId, $deliveryAppId) {
+                        $q->with(['prices' => function ($pq) use ($orderTypeId, $deliveryAppId) {
+                            $pq->where('status', true);
+                            if ($orderTypeId) {
+                                $pq->where('order_type_id', $orderTypeId);
+                            }
+                            if ($deliveryAppId && $deliveryAppId !== 'default') {
+                                $pq->where(function ($q) use ($deliveryAppId) {
+                                    $q->where('delivery_app_id', $deliveryAppId)
+                                      ->orWhereNull('delivery_app_id');
+                                });
+                            } else {
+                                $pq->whereNull('delivery_app_id');
+                            }
+                        }]);
+                    },
+                    'modifierGroups.options' => function ($q) use ($orderTypeId, $deliveryAppId) {
+                        $q->with(['prices' => function ($pq) use ($orderTypeId, $deliveryAppId) {
+                            $pq->where('status', true);
+                            if ($orderTypeId) {
+                                $pq->where('order_type_id', $orderTypeId);
+                            }
+                        }]);
+                    }
+                ])
+                ->get()
+                ->map(function ($item) use ($orderTypeId, $deliveryAppId) {
+                    // Set price context
+                    if ($orderTypeId) {
+                        $item->setPriceContext($orderTypeId, $deliveryAppId);
+                    }
+
+                    return [
+                        'id' => $item->id,
+                        'item_name' => $item->item_name,
+                        'menu_id' => $item->menu_id,
+                        'item_category_id' => $item->item_category_id,
+                        'price' => $item->price,
+                        'image' => $item->item_photo_url,
+                        'type' => $item->type,
+                        'in_stock' => (bool) $item->in_stock,
+                        'sort_order' => $item->sort_order ?? 0,
+                        'variations' => $item->variations->map(function ($v) use ($orderTypeId, $deliveryAppId) {
+                            if ($orderTypeId) {
+                                $v->setPriceContext($orderTypeId, $deliveryAppId);
+                            }
+                            return [
+                                'id' => $v->id,
+                                'variation_name' => $v->variation_name,
+                                'price' => $v->price,
+                            ];
+                        })->values(),
+                        'modifier_groups' => $item->modifierGroups->map(function ($group) use ($orderTypeId) {
+                            return [
+                                'id' => $group->id,
+                                'name' => $group->name,
+                                'required' => (bool) $group->required,
+                                'min_selection' => $group->min_selection,
+                                'max_selection' => $group->max_selection,
+                                'options' => $group->options->map(function ($opt) use ($orderTypeId) {
+                                    if ($orderTypeId) {
+                                        $opt->setPriceContext($orderTypeId, null);
+                                    }
+                                    return [
+                                        'id' => $opt->id,
+                                        'name' => $opt->name,
+                                        'price' => $opt->price ?? 0,
+                                    ];
+                                })->values(),
+                            ];
+                        })->values(),
+                    ];
+                });
+        });
+
+        return response()->json($menuItems);
+    }
+
     public function getWaiters()
     {
         $branch = $this->branch();

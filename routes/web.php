@@ -314,6 +314,7 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified'])->group
         Route::get('/waiters', [PosApiController::class, 'getWaiters'])->name('waiters');
         Route::get('/categories', [PosApiController::class, 'getCategories'])->name('categories');
         Route::get('/items', [PosApiController::class, 'getMenuItems'])->name('items');
+        Route::get('/items-with-variations', [PosApiController::class, 'getMenuItemsWithVariations'])->name('items-full');
         Route::get('/items/{itemId}/variations', [PosApiController::class, 'getItemVariations'])->name('items.variations');
         Route::get('/items/{itemId}/modifiers', [PosApiController::class, 'getItemModifiers'])->name('items.modifiers');
         Route::get('/items/{itemId}/price', [PosApiController::class, 'getItemPrices'])->name('items.price');
